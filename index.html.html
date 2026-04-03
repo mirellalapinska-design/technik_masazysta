@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Układ Mięśniowy — Atlas Anatomiczny</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e28;
+    --bg4: #222736;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #e8eaf0;
+    --text2: #9099b0;
+    --text3: #5a6278;
+    --accent: #c8a96e;
+    --accent2: #e8c88a;
+    --accent-dim: rgba(200,169,110,0.15);
+    --teal: #5ec4b0;
+    --teal-dim: rgba(94,196,176,0.12);
+    --red: #e06060;
+    --red-dim: rgba(224,96,96,0.12);
+    --radius: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── GRID BG ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,169,110,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,169,110,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(to bottom, rgba(200,169,110,0.04), transparent);
+  }
+
+  .header-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.1;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .header-sub {
+    margin-top: 0.75rem;
+    color: var(--text2);
+    font-size: 15px;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+  }
+
+  .header-stats {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.75rem;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 3px;
+  }
+
+  /* ── LAYOUT ── */
+  .app-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem 4rem;
+  }
+
+  /* ── TABS ── */
+  .tabs-row {
+    display: flex;
+    gap: 0;
+    margin: 2rem 0 1.5rem;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs-row::-webkit-scrollbar { display: none; }
+
+  .tab {
+    padding: 0.75rem 1.5rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text3);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -1px;
+  }
+
+  .tab:hover { color: var(--text2); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── PANEL ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── SEARCH BAR ── */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1.25rem;
+    align-items: center;
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 220px;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text3);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  input[type="text"], select {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]::placeholder { color: var(--text3); }
+
+  input[type="text"]:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+
+  select {
+    padding-left: 12px;
+    cursor: pointer;
+    min-width: 180px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a6278' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+
+  select option { background: var(--bg3); }
+
+  /* ── CHIPS ── */
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1rem;
+  }
+
+  .chip {
+    padding: 4px 12px;
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 400;
+    cursor: pointer;
+    color: var(--text2);
+    background: transparent;
+    transition: all 0.15s;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.on { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+  /* ── COUNT ── */
+  .result-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    overflow-x: auto;
+  }
+
+  .table-scroll {
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg4) transparent;
+  }
+
+  .table-scroll::-webkit-scrollbar { width: 6px; }
+  .table-scroll::-webkit-scrollbar-track { background: transparent; }
+  .table-scroll::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead { position: sticky; top: 0; z-index: 2; }
+
+  th {
+    padding: 11px 14px;
+    text-align: left;
+    background: var(--bg3);
+    color: var(--text3);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border2);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+
+  tr:hover td { background: rgba(255,255,255,0.025); }
+  tr:last-child td { border-bottom: none; }
+
+  td:first-child {
+    color: var(--text);
+    font-weight: 500;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .group-row td {
+    background: rgba(200,169,110,0.05) !important;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── JOINT GRID ── */
+  .joint-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+  }
+
+  .joint-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .joint-card:hover { border-color: var(--border2); }
+
+  .joint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 16px;
+    cursor: pointer;
+    background: var(--bg3);
+    transition: background 0.15s;
+  }
+
+  .joint-header:hover { background: var(--bg4); }
+
+  .joint-title {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text);
+    letter-spacing: 0.01em;
+  }
+
+  .joint-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .joint-body {
+    padding: 14px 16px;
+    display: none;
+  }
+
+  .joint-body.open { display: block; }
+
+  .motion-group { margin-bottom: 14px; }
+  .motion-group:last-child { margin-bottom: 0; }
+
+  .motion-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--teal-dim);
+  }
+
+  .motion-muscles {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .motion-muscles li {
+    font-size: 12.5px;
+    color: var(--text2);
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .motion-muscles li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text3);
+    font-size: 10px;
+  }
+
+  /* ── BREATHING GRID ── */
+  .breath-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  .breath-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .breath-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg3);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .breath-header:hover { background: var(--bg4); }
+
+  .breath-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .wdech .breath-dot { background: var(--teal); }
+  .wydech .breath-dot { background: var(--red); }
+
+  .breath-title {
+    font-weight: 600;
+    font-size: 13px;
+    flex: 1;
+  }
+
+  .wdech .breath-title { color: var(--teal); }
+  .wydech .breath-title { color: var(--red); }
+
+  .breath-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  .breath-body {
+    padding: 12px 16px;
+    display: none;
+  }
+
+  .breath-body.open { display: block; }
+
+  .breath-muscles {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .breath-muscles li {
+    font-size: 12.5px;
+    color: var(--text2);
+    padding-left: 14px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .breath-muscles li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text3);
+    font-size: 10px;
+  }
+
+  /* ── NO RESULTS ── */
+  .no-result {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 3rem;
+    color: var(--text3);
+    font-size: 14px;
+  }
+
+  .no-result span {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--text3);
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  footer a { color: var(--accent); text-decoration: none; }
+
+  /* ── SCROLLBAR GLOBAL ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    header { padding: 2rem 1rem 1.5rem; }
+    .tabs-row .tab { padding: 0.75rem 1rem; font-size: 11px; }
+    .joint-grid { grid-template-columns: 1fr; }
+    th, td { padding: 8px 10px; }
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel.active { animation: fadeSlide 0.25s ease; }
+
+  .joint-card { animation: fadeSlide 0.2s ease; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-label">Technik Masażysta · Semestr I · Anatomia z Fizjologią</div>
+  <h1>Układ <em>Mięśniowy</em></h1>
+  <p class="header-sub">Atlas anatomiczny — przyczepy, unerwienia, funkcje, ruchy w stawach</p>
+  <div class="header-stats">
+    <div class="stat"><div class="stat-num">70+</div><div class="stat-label">Mięśni</div></div>
+    <div class="stat"><div class="stat-num">11</div><div class="stat-label">Stawów</div></div>
+    <div class="stat"><div class="stat-num">80+</div><div class="stat-label">Ruchów</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Fazy oddechu</div></div>
+  </div>
+</header>
+
+<div class="app-wrap">
+
+  <div class="tabs-row" id="tabs">
+    <button class="tab active" data-panel="muscles">Mięśnie</button>
+    <button class="tab" data-panel="joints">Ruchy w stawach</button>
+    <button class="tab" data-panel="breathing">Oddychanie</button>
+  </div>
+
+  <!-- ══ PANEL: MIĘŚNIE ══ -->
+  <div class="panel active" id="panel-muscles">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="muscle-search" placeholder="Szukaj mięśnia, funkcji, nerwu, przyczepu...">
+      </div>
+      <select id="region-filter">
+        <option value="">— Wszystkie regiony —</option>
+      </select>
+    </div>
+    <div class="chip-row" id="filter-chips"></div>
+    <div class="result-meta" id="count-badge">Ładowanie...</div>
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="min-width:160px">Mięsień</th>
+              <th style="min-width:180px">Przyczep początk.</th>
+              <th style="min-width:180px">Przyczep końcowy</th>
+              <th style="min-width:150px">Unerwienie</th>
+              <th style="min-width:200px">Funkcja</th>
+            </tr>
+          </thead>
+          <tbody id="muscle-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PANEL: STAWY ══ -->
+  <div class="panel" id="panel-joints">
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="joint-search" placeholder="Szukaj stawu, ruchu, mięśnia...">
+      </div>
+    </div>
+    <div class="joint-grid" id="joint-grid"></div>
+  </div>
+
+  <!-- ══ PANEL: ODDYCHANIE ══ -->
+  <div class="panel" id="panel-breathing">
+    <div class="breath-grid" id="breath-grid"></div>
+  </div>
+
+</div>
+
+<footer>
+  Atlas Układu Mięśniowego &nbsp;·&nbsp; Anatomia z Fizjologią &nbsp;·&nbsp; Technik Masażysta
+</footer>
+
+<script>
+const muscles = [
+  {g:"Mięśnie głowy — sklepienie czaszki (mimiczne)",n:"m. naczaszny",pp:"Złożony z m. potyliczno-czołowego i m. skroniowo-ciemieniowego; między nimi czepiec ścięgnisty",pk:"Czepiec ścięgnisty",u:"N. twarzowy",f:"—"},
+  {g:"Mięśnie głowy — sklepienie czaszki (mimiczne)",n:"m. potyliczno-czołowy",pp:"Czepiec ścięgnisty",pk:"—",u:"N. twarzowy",f:"Poprzeczne zmarszczki na czole, wyraz uwagi"},
+  {g:"Mięśnie głowy — sklepienie czaszki (mimiczne)",n:"m. skroniowo-ciemieniowy",pp:"Obie strony czepca ścięgnistego",pk:"Chrząstka małżowiny usznej",u:"N. twarzowy",f:"Skurcz wywołuje zmarszczki na czole"},
+  {g:"Mięśnie głowy — szpary powiek (mimiczne)",n:"m. okrężny oka",pp:"Cz. oczodołowa, powiekowa, łzowa",pk:"—",u:"N. twarzowy",f:"Cz. oczodołowa: zaciska powieki; cz. powiekowa: mruganie; cz. łzowa: rozwiera woreczek łzowy"},
+  {g:"Mięśnie głowy — szpary powiek (mimiczne)",n:"m. marszczący brwi",pp:"Okolica nasady nosa",pk:"Skóra brwi",u:"N. twarzowy",f:"Wytwarza 2–3 fałdy między brwiami"},
+  {g:"Mięśnie głowy — szpary powiek (mimiczne)",n:"m. podłużny",pp:"Okolica międzybrwiowa",pk:"—",u:"N. twarzowy",f:"Wywołuje poprzeczne fałdy u nasady nosa"},
+  {g:"Mięśnie głowy — żuchwa",n:"m. skroniowy",pp:"Dół skroniowy, powięź skroniowa",pk:"Wyrostek dziobiasty żuchwy",u:"Nn. skroniowe głębokie (gałąź III n. V)",f:"Unosi żuchwę, obraca nieco na zewnątrz, cofa wysuniętą żuchwę"},
+  {g:"Mięśnie głowy — żuchwa",n:"m. żwacz",pp:"Kość jarzmowa, łuk jarzmowy",pk:"Boczna pow. gałęzi żuchwy, kąt żuchwy",u:"N. żwaczowy (gałąź III n. V)",f:"Współdziała z m. skroniowym w unoszeniu i obracaniu żuchwy; wysuwanie żuchwy"},
+  {g:"Mięśnie głowy — żuchwa",n:"m. skrzydłowy przyśrodkowy",pp:"Dół skrzydłowy kości klinowej",pk:"Pow. przyśrodkowa kąta żuchwy (guzowatość skrzydłowata)",u:"N. skrzydłowy przyśrodkowy (gałąź III n. V)",f:"Współdziała z m. skroniowym i żwaczowym"},
+  {g:"Mięśnie głowy — żuchwa",n:"m. skrzydłowy boczny",pp:"Głowa górna: pow. podskroniowa k. klinowej; głowa dolna: wyrostek skrzydłowaty",pk:"Dołek skrzydłowy wyrostka kłykciowego żuchwy; torebka stawu skroniowo-żuchwowego",u:"N. skrzydłowy boczny (gałąź III n. V)",f:"Obustronny: wysuwa żuchwę do przodu; jednostronny: skręca żuchwę do wewnątrz"},
+  {g:"Mięśnie głowy — szpara ust (mimiczne)",n:"m. okrężny ust",pp:"Cz. brzeżna i wargowa",pk:"—",u:"N. twarzowy",f:"Cz. brzeżna: zwęża czerwień wargową; cz. wargowa: wywija wargi (gwizdanie)"},
+  {g:"Mięśnie głowy — szpara ust (mimiczne)",n:"m. obniżacz kąta ust",pp:"Dolna część żuchwy",pk:"Kąt ust",u:"N. twarzowy",f:"Obniża kąt ust (wyraz smutku, cierpienia)"},
+  {g:"Mięśnie głowy — szpara ust (mimiczne)",n:"m. śmiechowy",pp:"Okolica policzka",pk:"Kąt ust",u:"N. twarzowy",f:"Pociąga kąt ust do boku, poszerza szparę ust"},
+  {g:"Mięśnie głowy — szpara ust (mimiczne)",n:"m. jarzmowy większy",pp:"Kość jarzmowa",pk:"Kąt ust",u:"N. twarzowy",f:"Pociąga wargę górną ku górze i do boku"},
+  {g:"Mięśnie głowy — szpara ust (mimiczne)",n:"m. policzkowy",pp:"Wyrostki zębodołowe szczęki i żuchwy",pk:"Kąt ust, wargi",u:"N. twarzowy",f:"Przyciska policzki do zębów; żucie pokarmu"},
+  {g:"Mięśnie szyi — powierzchowne",n:"m. szeroki szyi (platysma)",pp:"Tkanka podskórna na wys. II żebra",pk:"Zew. pow. trzonu żuchwy, kąty ust",u:"Gałąź szyjna n. twarzowego",f:"Unosi skórę szyi; pociąga kąty ust w dół (wyraz strachu)"},
+  {g:"Mięśnie szyi — powierzchowne",n:"m. mostkowo-obojczykowo-sutkowy",pp:"Rękojeść mostka (głowa przyśrodkowa), obojczyk (głowa boczna)",pk:"Wyrostek sutkowy k. skroniowej, kresa karkowa górna",u:"Gałąź zewn. n. dodatkowego, splot szyjny",f:"Jednostronny: pochyla głowę w tę samą stronę, obraca w przeciwną, unosi twarz; obustronny: unosi głowę; pomocniczy m. wdechowy"},
+  {g:"Mięśnie szyi — mięśnie podgnykowe",n:"m. mostkowo-gnykowy",pp:"Górna część mostka",pk:"Kość gnykowa",u:"Pętla szyjna",f:"Pociąga kość gnykową ku dołowi (żucie, przełykanie)"},
+  {g:"Mięśnie szyi — mięśnie podgnykowe",n:"m. tarczowo-gnykowy",pp:"Chrząstka tarczowa",pk:"Kość gnykowa",u:"Pętla szyjna",f:"Pociąga kość gnykową ku dołowi"},
+  {g:"Mięśnie szyi — mięśnie podgnykowe",n:"m. łopatkowo-gnykowy",pp:"Górny brzeg łopatki",pk:"Kość gnykowa",u:"Pętla szyjna",f:"Pociąga kość gnykową ku dołowi"},
+  {g:"Mięśnie szyi — mięśnie podgnykowe",n:"m. mostkowo-tarczowy",pp:"Mostek",pk:"Chrząstka tarczowa",u:"Gałęzie bezpośrednie od splotu szyjnego",f:"Pociąga kość gnykową ku dołowi"},
+  {g:"Mięśnie szyi — mięśnie nadgnykowe",n:"m. dwubrzuścowy",pp:"Wcięcie sutkowe k. skroniowej (brzusiec tylny); dół brzuścowy żuchwy (brzusiec przedni)",pk:"Kość gnykowa",u:"Gałęzie n. twarzowego (tylny); n. żuchwowo-gnykowy (przedni)",f:"Przy ustalonej żuchwie unosi kość gnykową; przy ustalonej kości gnykowej obniża żuchwę"},
+  {g:"Mięśnie szyi — mięśnie nadgnykowe",n:"m. rylcowo-gnykowy",pp:"Wyrostek rylcowaty k. skroniowej",pk:"Kość gnykowa",u:"Gałęzie n. twarzowego",f:"Pociąga kość gnykową ku górze i do tyłu"},
+  {g:"Mięśnie szyi — mięśnie nadgnykowe",n:"m. bródkowo-gnykowy",pp:"Kolec bródkowy żuchwy",pk:"Kość gnykowa",u:"N. żuchwowo-gnykowy",f:"Pociąga kość gnykową ku górze i do przodu"},
+  {g:"Mięśnie szyi — mięśnie nadgnykowe",n:"m. żuchwowo-gnykowy",pp:"Wewnętrzna strona trzonu żuchwy",pk:"Trzon kości gnykowej",u:"Gałęzie ze splotu szyjnego",f:"Przy ustalonej żuchwie unosi kość gnykową i język"},
+  {g:"Mięśnie szyi — mięśnie pochyłe",n:"m. pochyły przedni",pp:"Wyrostki poprzeczne C III–VI",pk:"Guzek I żebra",u:"Gałęzie splotu szyjnego i ramiennego",f:"Jednostronny: zgina kręgosłup szyjny w bok; obustronny: unosi żebra, zgina szyję ku przodowi"},
+  {g:"Mięśnie szyi — mięśnie pochyłe",n:"m. pochyły środkowy",pp:"Wyrostki poprzeczne wszystkich kręgów szyjnych",pk:"Górna pow. I żebra",u:"Gałązki splotu szyjnego i ramiennego",f:"Jak m. pochyły przedni"},
+  {g:"Mięśnie szyi — mięśnie pochyłe",n:"m. pochyły tylny",pp:"Wyrostki poprzeczne 2–3 ostatnich kręgów szyjnych",pk:"Brzeg górny II żebra",u:"Gałązki splotu szyjnego i ramiennego",f:"Jak m. pochyły przedni"},
+  {g:"Mięśnie szyi — mięśnie przedkręgowe",n:"m. długi głowy",pp:"Wyrostki poprzeczne C III–VI",pk:"Cz. podstawna k. potylicznej",u:"Gałązki splotu szyjnego",f:"Zgina głowę do przodu i w bok"},
+  {g:"Mięśnie szyi — mięśnie przedkręgowe",n:"m. długi szyi",pp:"Trzony kręgów szyjnych i piersiowych",pk:"Guzek przedni kręgu szczytowego, trzony kręgów wyżej",u:"Gałązki splotu szyjnego i ramiennego",f:"Obustronny: zgina głowę do przodu; jednostronny: obraca i zgina w bok"},
+  {g:"Mięśnie klatki piersiowej — warstwa powierzchowna",n:"m. piersiowy większy",pp:"Obojczyk (cz. obojczykowa), mostek i żebra I–V (cz. mostkowa), pochewka m. prostego brzucha (cz. brzuszna)",pk:"Grzebień guzka większego k. ramiennej",u:"Nn. piersiowe przednie ze splotu ramiennego",f:"Pociąga ramię do przodu i przyśrodkowo; opuszcza podniesione ramię; obraca do wewnątrz; pomocniczy m. wdechowy"},
+  {g:"Mięśnie klatki piersiowej — warstwa powierzchowna",n:"m. piersiowy mniejszy",pp:"Trzon II–V żebra",pk:"Wyrostek kruczy łopatki",u:"Nn. piersiowe przednie ze splotu ramiennego",f:"Obniża i pociąga przyśrodkowo obręcz barkową; pomocniczy m. wdechowy"},
+  {g:"Mięśnie klatki piersiowej — warstwa powierzchowna",n:"m. podobojczykowy",pp:"Koniec I żebra",pk:"Koniec barkowy obojczyka",u:"N. podobojczykowy ze splotu ramiennego",f:"Pociąga obojczyk do przodu i dołu"},
+  {g:"Mięśnie klatki piersiowej — warstwa powierzchowna",n:"m. zębaty przedni",pp:"9 górnych żeber",pk:"Przyśrodkowy brzeg łopatki",u:"N. piersiowy długi ze splotu ramiennego",f:"Ustala, obniża i obraca łopatkę; pociąga łopatkę ku przodowi; silny m. wdechowy"},
+  {g:"Mięśnie klatki piersiowej — warstwa głęboka",n:"mm. międzyżebrowe zewnętrzne",pp:"Dolny brzeg żebra wyższego",pk:"Górny brzeg żebra niższego",u:"Nn. międzyżebrowe",f:"Unoszą żebra (mm. wdechowe); utrzymują kształt klatki piersiowej"},
+  {g:"Mięśnie klatki piersiowej — warstwa głęboka",n:"mm. międzyżebrowe wewnętrzne",pp:"Wewnętrzna pow. żeber",pk:"Górny brzeg żebra niższego",u:"Nn. międzyżebrowe",f:"Obniżają żebra (mm. wydechowe)"},
+  {g:"Mięśnie klatki piersiowej — warstwa głęboka",n:"przepona",pp:"Cz. lędźwiowa (więzadła łukowe, odnogi), cz. żebrowa (chrząstki żeber 7–12), cz. mostkowa (wyrostek mieczykowaty)",pk:"Środek ścięgnisty",u:"Gałązki n. przeponowego",f:"Główny m. wdechowy (tor brzuszny); reguluje siłę wydychanego powietrza"},
+  {g:"Mięśnie brzucha — ściana przednia i boczna",n:"m. skośny zewnętrzny brzucha",pp:"Pow. boczne żeber 5–12",pk:"Pochewka m. prostego, kresa biała, w. pachwinowe, grzebień k. biodrowej",u:"Nn. międzyżebrowe (5–12), n. podżebrowy, n. biodrowo-podbrzuszny",f:"Jednostronny: zgięcie boczne i obrót tułowia w stronę przeciwną; obustronny: zgina kręgosłup do przodu"},
+  {g:"Mięśnie brzucha — ściana przednia i boczna",n:"m. skośny wewnętrzny brzucha",pp:"Powięź piersiowo-lędźwiowa, grzebień k. biodrowej, w. pachwinowe",pk:"Brzeg żeber 10–12, pochewka m. prostego",u:"Nn. międzyżebrowe (5–12), n. podżebrowy, n. biodrowo-podbrzuszny",f:"Jednostronny: obraca tułów w tę samą stronę; obustronny: zgina tułów do przodu"},
+  {g:"Mięśnie brzucha — ściana przednia i boczna",n:"m. poprzeczny brzucha",pp:"Chrząstki żeber 7–12, powięź piersiowo-lędźwiowa, grzebień k. biodrowej",pk:"Kresa półksiężycowata wchodząca w skład m. prostego brzucha",u:"Nn. międzyżebrowe (5–12), n. podżebrowy, n. biodrowo-podbrzuszny",f:"Zwęża klatkę piersiową; tworzy tłocznię brzucha (m. wydechowy)"},
+  {g:"Mięśnie brzucha — ściana przednia i boczna",n:"m. prosty brzucha",pp:"Wyrostek mieczykowaty, chrząstki żeber 5–7",pk:"Kość łonowa i spojenie łonowe",u:"Nn. międzyżebrowe 7–12",f:"Zbliża wyrostek mieczykowaty do spojenia łonowego; zgina tułów do przodu; m. wydechowy; antagonista prostownika grzbietu"},
+  {g:"Mięśnie brzucha — ściana przednia i boczna",n:"m. piramidowy",pp:"Kość łonowa i spojenie łonowe",pk:"Kresa biała",u:"N. podżebrowy",f:"Napina kresę białą"},
+  {g:"Mięśnie brzucha — ściana tylna",n:"mm. międzypoprzeczne boczne lędźwi",pp:"Wyrostki żebrowe kręgów lędźwiowych",pk:"Wyrostki żebrowe kręgów lędźwiowych",u:"Splot lędźwiowy",f:"Zginają kręgosłup do boku"},
+  {g:"Mięśnie brzucha — ściana tylna",n:"m. czworoboczny lędźwi",pp:"Wyrostki żebrowe kręgów lędźwiowych 2–5; grzebień biodrowy",pk:"Trzon XII kręgu piersiowego, XII żebro",u:"Splot lędźwiowy",f:"Jednostronny: zgięcie boczne tułowia; obustronny: obniża XII żebra; napięcie spoczynkowe ustala odcinek lędźwiowy"},
+  {g:"Mięśnie obręczy kończyny dolnej — wewnętrzne",n:"m. lędźwiowo-biodrowy",pp:"Trzony TH12–L4 (m. lędźwiowy większy); dół biodrowy (m. biodrowy)",pk:"Krętarz mniejszy k. udowej",u:"Gałęzie splotu lędźwiowego",f:"Zgina staw biodrowy; przywodzi udo; obraca udo na zewnątrz; jednostronny: zgina kręgosłup lędźwiowy w bok"},
+  {g:"Mięśnie obręczy kończyny dolnej — zewnętrzne",n:"m. gruszkowaty",pp:"Kość krzyżowa",pk:"Krętarz większy k. udowej",u:"Nn. splotu krzyżowego",f:"Obraca udo na zewnątrz; odwodzi udo; przy ustalonej kości dolnej pochyla miednicę"},
+  {g:"Mięśnie obręczy kończyny dolnej — zewnętrzne",n:"m. pośladkowy wielki",pp:"Powięź piersiowo-lędźwiowa, k. krzyżowa, talerz k. biodrowej, k. guziczna",pk:"Guzowatość pośladkowa k. udowej, powięź szeroka uda",u:"N. pośladkowy dolny",f:"Prostuje staw biodrowy; odwodzi i przywodzi udo; obraca udo na zewnątrz"},
+  {g:"Mięśnie obręczy kończyny dolnej — zewnętrzne",n:"m. pośladkowy średni",pp:"Pow. pośladkowa talerza biodrowego, grzebień biodrowy",pk:"Krętarz większy k. udowej",u:"N. pośladkowy górny",f:"Odwodzi udo; zgina i prostuje staw biodrowy; obraca udo na zewnątrz i do wewnątrz"},
+  {g:"Mięśnie obręczy kończyny dolnej — zewnętrzne",n:"m. pośladkowy mały",pp:"Pow. pośladkowa talerza biodrowego",pk:"Kłykieć większy k. udowej",u:"N. pośladkowy górny",f:"Odwodzi udo; zgina i prostuje staw biodrowy; obraca udo"},
+  {g:"Mięśnie obręczy kończyny dolnej — zewnętrzne",n:"m. naprężacz powięzi szerokiej uda",pp:"Przedni górny kolec biodrowy, powięź pośladkowa",pk:"Kłykieć boczny k. piszczelowej",u:"N. pośladkowy górny",f:"Zgina udo w stawie biodrowym; obraca udo do wewnątrz; odwodzi udo; ustala wyprostowany staw kolanowy"},
+  {g:"Mięśnie obręczy kończyny dolnej — zewnętrzne",n:"m. zasłaniacz wewnętrzny",pp:"Błona zasłonowa, k. miednicza",pk:"Dół krętarzowy k. udowej",u:"Nn. splotu krzyżowego",f:"Obraca udo na zewnątrz; przywodzi udo; prostuje udo"},
+  {g:"Mięśnie obręczy kończyny dolnej — zewnętrzne",n:"m. czworoboczny uda",pp:"Guz kulszowy",pk:"Grzebień międzykrętarzowy k. udowej",u:"Nn. splotu krzyżowego",f:"Obraca udo na zewnątrz; przywodzi udo; prostuje udo"},
+  {g:"Mięśnie uda — grupa przednia",n:"m. krawiecki",pp:"Kolec biodrowy przedni górny",pk:"Guzowatość piszczeli, powięź goleni",u:"N. udowy",f:"Zgina staw biodrowy; obraca udo na zewnątrz; odwodzi udo; zgina staw kolanowy; w zgięciu stawu kolanowego obraca podudzie do wewnątrz"},
+  {g:"Mięśnie uda — grupa przednia",n:"m. czworogłowy uda",pp:"M. prosty uda: kolec biodrowy przedni dolny; m. obszerny pośredni: trzon k. udowej; m. obszerny przyśrodkowy: warga przyśrodkowa kresy chropawej; m. obszerny boczny: krętarz większy",pk:"Rzepka, guzowatość piszczeli (via więzadło rzepki)",u:"N. udowy",f:"Prostuje staw kolanowy; m. prosty uda zgina staw biodrowy i odwodzi udo"},
+  {g:"Mięśnie uda — grupa przyśrodkowa",n:"m. grzebieniowy",pp:"Grzebień k. łonowej, guzek łonowy",pk:"Kresa grzbietowa k. udowej",u:"N. zasłonowy, n. udowy",f:"Przywodzi, zgina i obraca udo na zewnątrz"},
+  {g:"Mięśnie uda — grupa przyśrodkowa",n:"m. przywodziciel długi",pp:"Guzek łonowy i spojenie łonowe",pk:"Kresa chropawa k. udowej",u:"N. zasłonowy, n. udowy",f:"Zgina staw biodrowy; przywodzi udo; obraca udo na zewnątrz"},
+  {g:"Mięśnie uda — grupa przyśrodkowa",n:"m. przywodziciel krótki",pp:"Kość łonowa",pk:"Kresa chropawa k. udowej",u:"N. zasłonowy",f:"Zgina staw biodrowy; przywodzi udo; obraca udo na zewnątrz"},
+  {g:"Mięśnie uda — grupa przyśrodkowa",n:"m. przywodziciel wielki",pp:"Kość łonowa, k. kulszowa, guz kulszowy",pk:"Kresa chropawa k. udowej, kłykieć przyśrodkowy k. udowej",u:"N. zasłonowy, n. piszczelowy",f:"Przywodzi udo; obraca do wewnątrz i na zewnątrz; prostuje staw biodrowy; pomaga w utrzymaniu równowagi"},
+  {g:"Mięśnie uda — grupa przyśrodkowa",n:"m. smukły",pp:"Dolna gałąź k. łonowej, gałąź k. kulszowej",pk:"Guzowatość k. piszczelowej",u:"N. zasłonowy",f:"Przy wyprostowanym kolanie przywodzi udo; przy zgiętym obraca goleń do środka; zgina kolano"},
+  {g:"Mięśnie uda — grupa tylna",n:"m. półbłoniasty",pp:"Guz kulszowy",pk:"Kłykieć przyśrodkowy k. piszczelowej",u:"Gałąź n. piszczelowego",f:"Prostuje staw biodrowy; zgina staw kolanowy; przywodzi udo; obraca podudzie do wewnątrz"},
+  {g:"Mięśnie uda — grupa tylna",n:"m. półścięgnisty",pp:"Guz kulszowy",pk:"Guzowatość k. piszczelowej (gęsia stopka)",u:"N. piszczelowy",f:"Prostuje staw biodrowy; zgina staw kolanowy; obraca podudzie do wewnątrz"},
+  {g:"Mięśnie uda — grupa tylna",n:"m. dwugłowy uda",pp:"Głowa długa: guz kulszowy; głowa krótka: kresa chropawa k. udowej",pk:"Głowa k. strzałkowej",u:"N. piszczelowy (głowa długa), n. strzałkowy (głowa krótka)",f:"Prostuje staw biodrowy (głowa długa); zgina staw kolanowy; obraca podudzie na zewnątrz"},
+  {g:"Mięśnie goleni — grupa przednia",n:"m. piszczelowy przedni",pp:"Kłykieć boczny k. piszczelowej, błona międzykostna",pk:"K. klinowata przyśrodkowa, podstawa I k. śródstopia",u:"N. strzałkowy głęboki",f:"Silny prostownik stopy; zgina grzbietowo stopę; odwraca i nawraca stopę"},
+  {g:"Mięśnie goleni — grupa przednia",n:"m. prostownik długi palców",pp:"Kłykieć boczny k. piszczelowej, k. strzałkowa, błona międzykostna",pk:"Paliczki dalsze palców II–V",u:"N. strzałkowy",f:"Prostuje, nawraca i odwodzi stopę; prostuje palce; zgina grzbietowo stopę"},
+  {g:"Mięśnie goleni — grupa przednia",n:"m. prostownik długi palucha",pp:"Strzałka, błona międzykostna",pk:"Podstawa dalszego paliczka palucha",u:"N. strzałkowy głęboki",f:"Prostuje paluch; zgina grzbietowo stopę"},
+  {g:"Mięśnie goleni — grupa boczna",n:"m. strzałkowy długi",pp:"Głowa i górna część trzonu strzałki",pk:"K. klinowata przyśrodkowa, guzowatość I k. śródstopia",u:"N. strzałkowy powierzchniowy",f:"Zgina podeszwowo; nawraca i odwodzi stopę"},
+  {g:"Mięśnie goleni — grupa boczna",n:"m. strzałkowy krótki",pp:"Dolna część strzałki",pk:"Guzowatość V k. śródstopia",u:"N. strzałkowy powierzchniowy",f:"Zgina podeszwowo; nawraca i odwodzi stopę"},
+  {g:"Mięśnie goleni — warstwa tylna powierzchowna",n:"m. brzuchaty łydki",pp:"Kłykieć przyśrodkowy i boczny k. udowej",pk:"Guz piętowy",u:"N. piszczelowy",f:"Zgina podeszwowo; odwraca; przywodzi stopę; zgina kolano"},
+  {g:"Mięśnie goleni — warstwa tylna powierzchowna",n:"m. płaszczkowaty",pp:"Głowa strzałki, kresa m. płaszczkowatego k. piszczelowej",pk:"Guz piętowy",u:"N. piszczelowy",f:"Zgina podeszwowo; odwraca; przywodzi stopę; współdziała w utrzymaniu postawy pionowej"},
+  {g:"Mięśnie goleni — warstwa tylna powierzchowna",n:"m. podeszwowy",pp:"Kłykieć boczny k. udowej",pk:"Ścięgno piętowe lub guz piętowy",u:"N. piszczelowy",f:"Napina torebkę stawu kolanowego"},
+  {g:"Mięśnie goleni — warstwa tylna głęboka",n:"m. podkolanowy",pp:"Kłykieć boczny k. udowej, torebka stawu kolanowego",pk:"K. piszczelowa",u:"N. piszczelowy",f:"Przy zgiętym kolanie obraca goleń do wewnątrz; zgina podudzie; napina torebkę stawową"},
+  {g:"Mięśnie goleni — warstwa tylna głęboka",n:"m. piszczelowy tylny",pp:"Błona międzykostna, k. piszczelowa i strzałka",pk:"Guzowatość k. łódkowatej, k. klinowata przyśrodkowa",u:"N. piszczelowy",f:"Silny odwracacz i przywodziciel stopy; zgina stopę podeszwowo"},
+  {g:"Mięśnie goleni — warstwa tylna głęboka",n:"m. zginacz długi palców",pp:"K. piszczelowa, strzałka, błona międzykostna",pk:"Paliczki dalsze palców II–V",u:"N. piszczelowy",f:"Zgina palce; zgina stopę podeszwowo; odwraca i przywodzi stopę"},
+  {g:"Mięśnie goleni — warstwa tylna głęboka",n:"m. zginacz długi palucha",pp:"Strzałka, przegroda międzymięśniowa goleni",pk:"Podstawa dalszego paliczka palucha",u:"N. piszczelowy",f:"Zgina stopę podeszwowo; odwraca stopę; zgina paluch"},
+  {g:"Mięśnie kończyny górnej — obręcz",n:"m. naramienny (deltoideus)",pp:"Obojczyk (cz. obojczykowa), wyrostek barkowy (cz. barkowa), grzebień łopatki (cz. grzebieniowa)",pk:"Guzowatość naramienna k. ramiennej",u:"N. pachowy",f:"Cz. obojczykowa: nawraca, przywodzi do przodu; cz. barkowa: odwodzi; cz. grzebieniowa: odwraca, przywodzi do tyłu"},
+  {g:"Mięśnie kończyny górnej — obręcz",n:"m. nadgrzebieniowy",pp:"Dół nadgrzebieniowy, powięź nadgrzebieniowa",pk:"Górna pow. guzka większego k. ramiennej",u:"N. nadłopatkowy",f:"Odwraca ramię; napina torebkę stawu ramiennego; odwodzi ramię"},
+  {g:"Mięśnie kończyny górnej — obręcz",n:"m. podgrzebieniowy",pp:"Dół podgrzebieniowy",pk:"Pow. środkowa guzka większego k. ramiennej",u:"N. nadłopatkowy",f:"Odwraca ramię; cz. górna współdziała przy odwodzeniu i zginaniu"},
+  {g:"Mięśnie kończyny górnej — obręcz",n:"m. obły mniejszy",pp:"Pow. grzbietowa bocznego brzegu łopatki",pk:"Dolna pow. guzka większego k. ramiennej",u:"N. pachowy",f:"Odwraca ramię; napina torebkę stawu ramiennego"},
+  {g:"Mięśnie kończyny górnej — obręcz",n:"m. obły większy",pp:"Pow. grzbietowa dolnego kąta łopatki",pk:"Grzebień guzka mniejszego k. ramiennej",u:"N. podłopatkowy",f:"Opuszcza podniesione ramię; przywodzi ramię do tyłu; nawraca ramię"},
+  {g:"Mięśnie kończyny górnej — obręcz",n:"m. podłopatkowy",pp:"Pow. żebrowa łopatki, powięź podłopatkowa",pk:"Guzek mniejszy k. ramiennej",u:"Nn. podłopatkowe",f:"Nawraca ramię; przywodzi ramię; napina torebkę stawową"},
+  {g:"Mięśnie ramienia — grupa przednia",n:"m. kruczo-ramienny",pp:"Wyrostek kruczy łopatki",pk:"Pow. przednio-przyśrodkowa k. ramiennej",u:"N. mięśniowo-skórny",f:"Zgina i przywodzi ramię; nieznacznie nawraca i odwraca ramię"},
+  {g:"Mięśnie ramienia — grupa przednia",n:"m. dwugłowy ramienia",pp:"Głowa długa: guzek nadpanewkowy łopatki; głowa krótka: wyrostek kruczy łopatki",pk:"Guzowatość k. promieniowej",u:"N. mięśniowo-skórny",f:"Zgina ramię; głowa długa: odwodzi i nawraca ramię; głowa krótka: przywodzi; zgina i odwraca przedramię"},
+  {g:"Mięśnie ramienia — grupa przednia",n:"m. ramienny",pp:"Przednia pow. dolnej połowy k. ramiennej",pk:"Guzowatość k. łokciowej",u:"N. mięśniowo-skórny",f:"Zgina staw łokciowy"},
+  {g:"Mięśnie ramienia — grupa tylna",n:"m. trójgłowy ramienia",pp:"Głowa długa: guzek podpanewkowy łopatki; głowa boczna i przyśrodkowa: pow. tylna k. ramiennej",pk:"Tylna pow. wyrostka łokciowego",u:"N. promieniowy",f:"Prostuje staw łokciowy; głowa długa: prostuje i przywodzi ramię"},
+  {g:"Mięśnie ramienia — grupa tylna",n:"m. łokciowy",pp:"Nadkłykieć boczny k. ramiennej",pk:"Pow. tylna trzonu k. łokciowej",u:"N. promieniowy",f:"Słaby prostownik stawu łokciowego"},
+  {g:"Mięśnie przedramienia — grupa przednia",n:"m. nawrotny obły",pp:"Nadkłykieć przyśrodkowy k. ramiennej; wyrostek dziobiasty k. łokciowej",pk:"Boczna pow. środkowej części k. promieniowej",u:"N. pośrodkowy",f:"Nawraca przedramię; zgina przedramię"},
+  {g:"Mięśnie przedramienia — grupa przednia",n:"m. zginacz promieniowy nadgarstka",pp:"Nadkłykieć przyśrodkowy k. ramiennej",pk:"Podstawa II i III k. śródręcza (str. dłoniowa)",u:"N. pośrodkowy",f:"Zgina przedramię; zgina rękę dłoniowo i odwodzi promieniowo"},
+  {g:"Mięśnie przedramienia — grupa przednia",n:"m. dłoniowy długi",pp:"Nadkłykieć przyśrodkowy k. ramiennej",pk:"Rozcięgno dłoniowe",u:"N. pośrodkowy",f:"Napina rozcięgno dłoniowe; zgięcie ręki i palców; nieznacznie zgina i nawraca przedramię"},
+  {g:"Mięśnie przedramienia — grupa przednia",n:"m. zginacz łokciowy nadgarstka",pp:"Nadkłykieć przyśrodkowy k. ramiennej; tylna pow. wyrostka łokciowego",pk:"K. grochowata",u:"N. łokciowy",f:"Zgina dłoniowo rękę; odwodzi w kierunku łokciowym"},
+  {g:"Mięśnie przedramienia — grupa przednia",n:"m. zginacz powierzchowny palców",pp:"Nadkłykieć przyśrodkowy, wyrostek dziobiasty, pow. przednia k. promieniowej",pk:"Paliczki środkowe palców II–V",u:"N. pośrodkowy",f:"Zgina rękę i palce"},
+  {g:"Mięśnie przedramienia — grupa przednia",n:"m. zginacz głęboki palców",pp:"Pow. przyśrodkowa i przednia k. łokciowej",pk:"Podstawy paliczków dalszych palców II–V",u:"N. pośrodkowy",f:"Zgina wszystkie stawy palców II–V; zgina i przywodzi rękę"},
+  {g:"Mięśnie przedramienia — grupa przednia",n:"m. zginacz długi kciuka",pp:"Przednia pow. k. promieniowej",pk:"Podstawa dalszego paliczka kciuka",u:"N. pośrodkowy",f:"Zgina rękę i kciuk; nieznacznie odwodzi rękę"},
+  {g:"Mięśnie przedramienia — grupa przednia",n:"m. nawrotny czworoboczny",pp:"Przednia pow. dalszej części trzonu k. łokciowej",pk:"Przednia pow. trzonu k. promieniowej",u:"N. pośrodkowy",f:"Nawraca przedramię"},
+  {g:"Mięśnie przedramienia — grupa boczna",n:"m. ramienno-promieniowy",pp:"Brzeg boczny dolnej połowy k. ramiennej",pk:"Powyżej wyrostka rylcowatego k. promieniowej",u:"N. promieniowy",f:"Zgina przedramię; nawrócone odwraca, odwrócone nawraca"},
+  {g:"Mięśnie przedramienia — grupa boczna",n:"m. odwracacz",pp:"Nadkłykieć boczny k. ramiennej; tylna str k. łokciowej",pk:"Górna część pow. bocznej i tylnej k. promieniowej",u:"N. promieniowy (gałąź głęboka)",f:"Odwraca przedramię"},
+  {g:"Mięśnie przedramienia — grupa boczna",n:"m. prostownik promieniowy długi nadgarstka",pp:"Nadkłykieć boczny i brzeg boczny k. ramiennej",pk:"Grzbietowa str podstawy II k. śródręcza",u:"N. promieniowy (gałąź głęboka)",f:"Zgina przedramię; zgina grzbietowo rękę i odwodzi promieniowo"},
+  {g:"Mięśnie przedramienia — grupa boczna",n:"m. prostownik promieniowy krótki nadgarstka",pp:"Nadkłykieć boczny k. ramiennej",pk:"Grzbietowa str podstawy III k. śródręcza",u:"N. promieniowy (gałąź głęboka)",f:"Prostuje rękę"},
+  {g:"Mięśnie przedramienia — grupa tylna",n:"m. prostownik palców",pp:"Nadkłykieć boczny k. ramiennej",pk:"Paliczki bliższe palców II–V",u:"N. promieniowy (gałąź głęboka)",f:"Prostuje i zgina grzbietowo rękę; prostuje palce i odwodzi je"},
+  {g:"Mięśnie przedramienia — grupa tylna",n:"m. prostownik łokciowy nadgarstka",pp:"Nadkłykieć boczny k. ramiennej; tylna pow. k. łokciowej",pk:"Podstawa V k. śródręcza",u:"N. promieniowy (gałąź głęboka)",f:"Prostuje rękę; odwodzi w str łokciową"},
+  {g:"Mięśnie przedramienia — grupa tylna",n:"m. odwodziciel długi kciuka",pp:"Tylna pow. k. łokciowej i k. promieniowej",pk:"Podstawa I k. śródręcza",u:"N. promieniowy (gałąź głęboka)",f:"Główny odwodziciel ręki promieniowo; odwodzi i odprowadza kciuk"},
+  {g:"Mięśnie przedramienia — grupa tylna",n:"m. prostownik długi kciuka",pp:"Środkowa cz. tylnej pow. k. łokciowej",pk:"Podstawa dalszego paliczka kciuka",u:"N. promieniowy (gałąź głęboka)",f:"Prostuje kciuk; przywodzi kciuk; słaby prostownik ręki"},
+  {g:"Mięśnie grzbietu — warstwa powierzchowna",n:"m. czworoboczny",pp:"Kresa karkowa górna, guzowatość potyliczna zewn., w. karkowe, wyrostki kolczyste C7–TH12",pk:"Koniec barkowy obojczyka, wyrostek barkowy i grzebień łopatki",u:"Gałąź zewn. n. dodatkowego, splot szyjny",f:"Cz. górna: unosi staw ramienny; cz. środkowa: przybliża łopatkę do kręgosłupa; cz. dolna: obniża st. ramienny; obustronny: cofa barki"},
+  {g:"Mięśnie grzbietu — warstwa powierzchowna",n:"m. najszerszy grzbietu",pp:"Wyrostki kolczyste 6 dolnych kręgów piersiowych, wszystkich lędźwiowych, grzebień krzyżowy pośrodkowy, grzebień biodrowy, kąt dolny łopatki",pk:"Grzebień guzka mniejszego k. ramiennej",u:"N. piersiowo-grzbietowy",f:"Opuszcza podniesione ramię; przywodzi je do tyłu i obraca do wewnątrz; pociąga tułów ku górze"},
+  {g:"Mięśnie grzbietu — warstwa powierzchowna",n:"m. równoległoboczny",pp:"Wyrostki kolczyste C6–TH4",pk:"Przyśrodkowy brzeg łopatki",u:"N. grzbietowy łopatki",f:"Pociąga łopatkę ku górze i ku środkowi"},
+  {g:"Mięśnie grzbietu — warstwa powierzchowna",n:"m. dźwigacz łopatki",pp:"Guzki tylne wyrostków poprzecznych C1–C4",pk:"Górny kąt łopatki; brzeg przyśrodkowy",u:"Splot szyjny i n. grzbietowy łopatki",f:"Pociąga łopatkę ku górze i ku środkowi"},
+  {g:"Mięśnie grzbietu — warstwa powierzchowna",n:"m. zębaty tylny górny",pp:"W. karkowe; wyrostki kolczyste C6–TH2",pk:"Żebra 2–5",u:"Nn. międzyżebrowe I–IV",f:"Dźwiga żebra (m. wdechowy)"},
+  {g:"Mięśnie grzbietu — warstwa powierzchowna",n:"m. zębaty tylny dolny",pp:"Powięź piersiowo-lędźwiowa; wyrostki kolczyste TH11–L2",pk:"Brzegi dolne żeber 9–12",u:"Nn. międzyżebrowe",f:"Obniża ostatnie żebra i pociąga je ku tyłowi (m. wydechowy)"},
+  {g:"Mięśnie grzbietu — warstwa głęboka (długie)",n:"m. prostownik grzbietu (erector spinae)",pp:"Grzebień biodrowy, k. krzyżowa, wyrostki kolczyste kręgów lędźwiowych",pk:"Żebra, wyrostki poprzeczne i kolczyste kręgów wyżej (biodrowo-żebrowy, najdłuższy, kolcowy)",u:"Nn. rdzeniowe C2–L5",f:"Obustronny: prostuje kręgosłup i głowę; jednostronny: zgina kręgosłup w bok"},
+  {g:"Mięśnie grzbietu — warstwa głęboka (krótkie)",n:"m. wielodzielny",pp:"K. krzyżowa, grzebień biodrowy, wyrostki kręgów lędźwiowych, piersiowych i szyjnych",pk:"Wyrostki kolczyste kręgów 2–4 poziomy wyżej",u:"Gałęzie grzbietowe nn. rdzeniowych",f:"Obustronny: prostuje kręgosłup; jednostronny: zgina do boku i obraca w stronę przeciwną"},
+  {g:"Mięśnie grzbietu — warstwa głęboka (krótkie)",n:"m. półkolcowy",pp:"Wyrostki poprzeczne kręgów piersiowych i szyjnych",pk:"Wyrostki kolczyste wyżej; łuska k. potylicznej",u:"Gałęzie grzbietowe nn. rdzeniowych",f:"Prostuje kręgosłup szyjny; obustronny: zgina głowę ku tyłowi; jednostronny: obraca w stronę przeciwną"},
+  {g:"Mięśnie grzbietu — warstwa głęboka (krótkie)",n:"mm. skręcające",pp:"Wyrostki poprzeczne kręgów",pk:"Nasady wyrostków kolczystych kręgów wyżej",u:"Gałęzie grzbietowe nn. rdzeniowych",f:"Obustronny: prostuje kręgosłup; jednostronny: obraca w stronę przeciwną"},
+  {g:"Mięśnie podpotyliczne",n:"m. prosty tylny większy głowy",pp:"Wyrostek kolczasty kr. obrotowego",pk:"Kresa karkowa dolna",u:"N. podpotyliczny",f:"Obustronny: unosi głowę; jednostronny: obraca twarz w swoją stronę"},
+  {g:"Mięśnie podpotyliczne",n:"m. prosty tylny mniejszy głowy",pp:"Guzek tylny kr. szczytowego",pk:"Kresa karkowa dolna",u:"N. podpotyliczny",f:"Obustronny: unosi głowę; jednostronny: obraca twarz w swoją stronę"},
+  {g:"Mięśnie podpotyliczne",n:"m. skośny górny głowy",pp:"Wyrostek poprzeczny kr. szczytowego",pk:"Kresa karkowa dolna",u:"N. podpotyliczny",f:"Obustronny: prostuje głowę; jednostronny: obraca twarz w stronę przeciwną"},
+  {g:"Mięśnie podpotyliczne",n:"m. skośny dolny głowy",pp:"Wyrostek kolczasty kr. obrotowego",pk:"Wyrostek poprzeczny kr. szczytowego",u:"N. podpotyliczny",f:"Obraca głowę na swoją stronę"},
+];
+
+const joints = [
+  {name:"Staw skroniowo-żuchwowy",motions:[
+    {m:"Wysuwanie żuchwy",ms:["m. skrzydłowy boczny"]},
+    {m:"Cofanie żuchwy",ms:["m. skroniowy"]},
+    {m:"Unoszenie żuchwy (zamykanie ust)",ms:["m. skroniowy","m. żwacz","m. skrzydłowy przyśrodkowy"]},
+    {m:"Obniżanie żuchwy (otwieranie ust)",ms:["m. skrzydłowy boczny","m. żuchwowo-gnykowy","m. dwubrzuścowy","m. bródkowo-gnykowy"]},
+    {m:"Ruchy obrotowe (żucie)",ms:["m. skrzydłowy boczny","m. skroniowy","m. żwacz","m. skrzydłowy przyśrodkowy","m. policzkowy"]},
+  ]},
+  {name:"Obręcz kończyny górnej (łopatka)",motions:[
+    {m:"Unoszenie łopatki",ms:["m. czworoboczny (cz. zstępująca)","m. równoległoboczny","m. dźwigacz łopatki","m. zębaty przedni (cz. górna)"]},
+    {m:"Obniżanie łopatki",ms:["m. czworoboczny (cz. wstępująca)","m. piersiowy mniejszy","m. podobojczykowy"]},
+    {m:"Wysuwanie łopatki do przodu",ms:["m. zębaty przedni","m. piersiowy mniejszy","m. podobojczykowy"]},
+    {m:"Cofanie łopatki",ms:["m. czworoboczny (cz. poprzeczna)","m. równoległoboczny"]},
+  ]},
+  {name:"Staw ramienny",motions:[
+    {m:"Zginanie do przodu",ms:["m. naramienny (cz. obojczykowa)","m. piersiowy większy (cz. obojczykowa)","m. kruczo-ramienny"]},
+    {m:"Zginanie do tyłu",ms:["m. naramienny (cz. grzebieniowa)","m. najszerszy grzbietu","m. obły większy","m. trójgłowy (głowa długa)"]},
+    {m:"Odwodzenie",ms:["m. naramienny (cz. barkowa)","m. nadgrzebieniowy","m. dwugłowy (głowa długa)"]},
+    {m:"Przywodzenie",ms:["m. naramienny (cz. obojczykowa i grzebieniowa)","m. piersiowy większy","m. najszerszy grzbietu","m. obły większy","m. trójgłowy (głowa długa)","m. dwugłowy (głowa krótka)","m. kruczo-ramienny"]},
+    {m:"Nawracanie",ms:["m. naramienny (cz. obojczykowa)","m. podłopatkowy","m. najszerszy grzbietu","m. piersiowy większy","m. obły większy","m. kruczo-ramienny"]},
+    {m:"Odwracanie",ms:["m. naramienny (cz. grzebieniowa)","m. podgrzebieniowy","m. obły mniejszy"]},
+  ]},
+  {name:"Staw łokciowy",motions:[
+    {m:"Zginanie",ms:["m. dwugłowy ramienia","m. ramienny","m. ramienno-promieniowy"]},
+    {m:"Prostowanie",ms:["m. trójgłowy ramienia","m. łokciowy"]},
+  ]},
+  {name:"Stawy promieniowo-łokciowe (rotacja przedramienia)",motions:[
+    {m:"Odwracanie",ms:["m. dwugłowy ramienia","m. odwracacz","m. ramienno-promieniowy","m. prostownik długi kciuka","m. odwodziciel długi kciuka"]},
+    {m:"Nawracanie",ms:["m. nawrotny obły","m. nawrotny czworoboczny","m. ramienno-promieniowy","m. zginacz promieniowy nadgarstka"]},
+  ]},
+  {name:"Stawy nadgarstkowe (ręka)",motions:[
+    {m:"Zginanie dłoniowe",ms:["m. zginacz pow. palców","m. zginacz głęboki palców","m. zginacz długi kciuka","m. zginacz promieniowy nadgarstka","m. zginacz łokciowy nadgarstka","m. dłoniowy długi"]},
+    {m:"Zginanie grzbietowe",ms:["m. prostownik palców","m. prostownik promieniowy długi nadgarstka","m. prostownik promieniowy krótki nadgarstka","m. prostownik łokciowy nadgarstka","m. prostownik długi kciuka"]},
+    {m:"Odwodzenie promieniowe",ms:["m. odwodziciel długi kciuka","m. prostownik promieniowy długi nadgarstka","m. prostownik promieniowy krótki nadgarstka","m. zginacz promieniowy nadgarstka"]},
+    {m:"Przywodzenie łokciowe",ms:["m. zginacz łokciowy nadgarstka","m. prostownik łokciowy nadgarstka","m. prostownik palców"]},
+  ]},
+  {name:"Staw biodrowy",motions:[
+    {m:"Zginanie do przodu",ms:["m. prosty uda","m. biodrowo-lędźwiowy","m. naprężacz powięzi szerokiej","m. krawiecki","m. przywodziciel długi","m. przywodziciel krótki","m. grzebieniowy","m. smukły","m. pośladkowy średni (cz. przednia)","m. pośladkowy mały (cz. przednia)"]},
+    {m:"Prostowanie (zginanie do tyłu)",ms:["m. pośladkowy wielki","m. pośladkowy średni (cz. tylna)","m. półbłoniasty","m. dwugłowy uda (głowa długa)","m. półścięgnisty","m. gruszkowaty","m. zasłaniacz wewnętrzny","m. bliźniacze"]},
+    {m:"Przywodzenie",ms:["m. przywodziciel wielki","m. przywodziciel długi","m. przywodziciel krótki","m. grzebieniowy","m. smukły","m. czworoboczny uda","m. zasłaniacz zewnętrzny","m. biodrowo-lędźwiowy"]},
+    {m:"Odwodzenie",ms:["m. pośladkowy wielki (cz. dolna)","m. pośladkowy średni","m. pośladkowy mały","m. zasłaniacz wewnętrzny","m. gruszkowaty","m. bliźniacze","m. krawiecki","m. prosty uda"]},
+    {m:"Nawracanie",ms:["m. przywodziciel wielki (cz. dolna)","m. pośladkowy mały (cz. przednia)","m. pośladkowy średni (cz. przednia)","m. półścięgnisty","m. półbłoniasty","m. naprężacz powięzi szerokiej","m. smukły"]},
+    {m:"Odwracanie",ms:["m. pośladkowy wielki","m. gruszkowaty","m. zasłaniacz wewnętrzny","m. bliźniacze","m. czworoboczny uda","m. zasłaniacz zewnętrzny"]},
+  ]},
+  {name:"Staw kolanowy",motions:[
+    {m:"Prostowanie",ms:["m. czworogłowy uda"]},
+    {m:"Zginanie",ms:["m. dwugłowy uda","m. półbłoniasty","m. półścięgnisty","m. krawiecki","m. podkolanowy","m. brzuchaty łydki"]},
+    {m:"Nawracanie podudzia",ms:["m. półbłoniasty","m. półścięgnisty","m. krawiecki","m. smukły","m. podkolanowy","m. brzuchaty łydki (głowa przyśrodkowa)"]},
+    {m:"Odwracanie podudzia",ms:["m. dwugłowy uda","m. brzuchaty łydki (głowa boczna)"]},
+  ]},
+  {name:"Stawy stopy — bliższe",motions:[
+    {m:"Zginanie grzbietowe",ms:["m. piszczelowy przedni","m. prostownik długi palców","m. prostownik długi palucha","m. strzałkowy trzeci"]},
+    {m:"Zginanie podeszwowe",ms:["m. trójgłowy łydki","m. piszczelowy tylny","m. zginacz długi palucha","m. zginacz długi palców","m. strzałkowy krótki","m. podeszwowy"]},
+    {m:"Odwracanie",ms:["m. trójgłowy łydki","m. piszczelowy przedni","m. piszczelowy tylny","m. zginacz długi palucha","m. zginacz długi palców"]},
+    {m:"Nawracanie",ms:["m. strzałkowy długi","m. strzałkowy krótki","m. strzałkowy trzeci","m. prostownik długi palucha","m. prostownik długi palców"]},
+    {m:"Odwodzenie stopy",ms:["m. strzałkowy długi","m. strzałkowy krótki","m. strzałkowy trzeci"]},
+    {m:"Przywodzenie stopy",ms:["m. piszczelowy przedni","m. piszczelowy tylny","m. zginacz długi palucha","m. zginacz długi palców"]},
+  ]},
+  {name:"Kręgosłup szyjny",motions:[
+    {m:"Zginanie do przodu",ms:["m. długi szyjny","m. mostkowo-obojczykowo-sutkowy","m. pochyły przedni"]},
+    {m:"Zginanie do tyłu",ms:["m. płatowaty","m. prostownik grzbietu"]},
+    {m:"Zginanie w bok",ms:["m. pochyłe","m. płatowaty","m. długi szyi (cz. boczna)","m. mostkowo-obojczykowo-sutkowy","m. prostownik grzbietu","m. dźwigacz łopatki"]},
+    {m:"Skręcanie w tę samą stronę",ms:["m. płatowaty"]},
+    {m:"Skręcanie w przeciwną stronę",ms:["m. mostkowo-obojczykowo-sutkowy","m. półkolcowy","m. wielodzielny","m. skręcające"]},
+  ]},
+  {name:"Kręgosłup piersiowy i lędźwiowy",motions:[
+    {m:"Zginanie do przodu",ms:["m. prosty brzucha","m. skośny zewnętrzny brzucha","m. skośny wewnętrzny brzucha"]},
+    {m:"Prostowanie (zginanie do tyłu)",ms:["m. prostownik grzbietu"]},
+    {m:"Zginanie w bok",ms:["m. prostownik grzbietu","m. skośny zewnętrzny brzucha","m. skośny wewnętrzny brzucha","m. czworoboczny lędźwi","m. lędźwiowy większy"]},
+    {m:"Skręcanie w tę samą stronę",ms:["m. skośny wewnętrzny brzucha","m. krzyżowo-grzbietowy"]},
+    {m:"Skręcanie w przeciwną stronę",ms:["m. skośny zewnętrzny brzucha","m. poprzeczno-kolcowy"]},
+  ]},
+  {name:"Głowa",motions:[
+    {m:"Zginanie do przodu",ms:["m. długi głowy","m. prosty głowy przedni"]},
+    {m:"Zginanie do tyłu",ms:["m. czworoboczny (cz. górna)","m. prostownik grzbietu","m. podpotyliczne","m. mostkowo-obojczykowo-sutkowy"]},
+    {m:"Zginanie w bok",ms:["m. płatowaty","m. mostkowo-obojczykowo-sutkowy","m. prosty głowy boczny","m. półkolcowy"]},
+    {m:"Obracanie w tę samą stronę",ms:["m. płatowaty","m. skośny głowy dolny","m. prosty głowy tylny większy"]},
+    {m:"Obracanie w przeciwną stronę",ms:["m. mostkowo-obojczykowo-sutkowy","m. czworoboczny (cz. górna)","m. półkolcowy"]},
+  ]},
+];
+
+const breathing = [
+  {type:"wdech",name:"Wdech spoczynkowy",ms:["przepona","mm. międzyżebrowe zewnętrzne","m. zębaty tylny górny","m. piersiowy mniejszy","m. podobojczykowy","m. zębaty przedni","m. czworoboczny grzbietu","m. równoległoboczny","m. dźwigacz łopatki","m. piersiowy większy","m. najszerszy grzbietu","m. prostownik grzbietu"]},
+  {type:"wdech",name:"Wdech wysiłkowy",ms:["m. pochyłe","m. mostkowo-obojczykowo-sutkowy"]},
+  {type:"wydech",name:"Wydech spoczynkowy",ms:["mm. międzyżebrowe wewnętrzne"]},
+  {type:"wydech",name:"Wydech wysiłkowy",ms:["m. prosty brzucha","m. skośny zewnętrzny brzucha","m. skośny wewnętrzny brzucha","m. poprzeczny brzucha","m. czworoboczny lędźwi","m. poprzeczny klatki piersiowej","m. zębaty tylny dolny","m. najszerszy grzbietu"]},
+];
+
+/* ──── MUSCLES PANEL ──── */
+const groups = [...new Set(muscles.map(m=>m.g))];
+const sel = document.getElementById('region-filter');
+groups.forEach(g=>{
+  const o=document.createElement('option');
+  o.value=g;
+  const short=g.replace(/^Mięśnie /,'').replace(/^mm\./,'');
+  o.textContent=short.charAt(0).toUpperCase()+short.slice(1);
+  sel.appendChild(o);
+});
+
+const qf = ['prostuje','zgina','odwodzi','przywodzi','obraca','nawraca','odwraca','nawrotny','N. piszczelowy','N. udowy','N. twarzowy','N. promieniowy','N. pośrodkowy','N. łokciowy','splot szyjny'];
+const chipRow=document.getElementById('filter-chips');
+qf.forEach(f=>{
+  const c=document.createElement('button');
+  c.className='chip';c.textContent=f;
+  c.onclick=()=>{
+    const inp=document.getElementById('muscle-search');
+    if(inp.value===f){inp.value='';c.classList.remove('on');}
+    else{inp.value=f;document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');}
+    renderMuscles();
+  };
+  chipRow.appendChild(c);
+});
+
+function renderMuscles(){
+  const q=document.getElementById('muscle-search').value.toLowerCase();
+  const gr=document.getElementById('region-filter').value;
+  const tbody=document.getElementById('muscle-tbody');
+  tbody.innerHTML='';
+  let grouped={}, total=0;
+  muscles.filter(m=>{
+    const match=!q||m.n.toLowerCase().includes(q)||m.f.toLowerCase().includes(q)||m.u.toLowerCase().includes(q)||m.pp.toLowerCase().includes(q)||m.pk.toLowerCase().includes(q);
+    return match && (!gr||m.g===gr);
+  }).forEach(m=>{
+    if(!grouped[m.g])grouped[m.g]=[];
+    grouped[m.g].push(m);
+  });
+  Object.entries(grouped).forEach(([g,ms])=>{
+    const gr=document.createElement('tr');gr.className='group-row';
+    gr.innerHTML=`<td colspan="5">${g}</td>`;
+    tbody.appendChild(gr);
+    ms.forEach(m=>{
+      total++;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${m.n}</td><td>${m.pp}</td><td>${m.pk}</td><td>${m.u}</td><td>${m.f}</td>`;
+      tbody.appendChild(tr);
+    });
+  });
+  document.getElementById('count-badge').textContent=`Wyniki: ${total} mięśni`;
+  if(!total){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td colspan="5" style="text-align:center;padding:2rem;color:#5a6278;font-style:italic">Brak wyników dla podanego zapytania</td>`;
+    tbody.appendChild(tr);
+  }
+}
+renderMuscles();
+document.getElementById('muscle-search').addEventListener('input',()=>{document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));renderMuscles()});
+document.getElementById('region-filter').addEventListener('change',renderMuscles);
+
+/* ──── JOINTS PANEL ──── */
+function renderJoints(filter=''){
+  const grid=document.getElementById('joint-grid');
+  grid.innerHTML='';
+  const q=filter.toLowerCase();
+  let count=0;
+  joints.forEach(j=>{
+    const match=!q||j.name.toLowerCase().includes(q)||j.motions.some(m=>m.m.toLowerCase().includes(q)||m.ms.some(s=>s.toLowerCase().includes(q)));
+    if(!match)return;
+    count++;
+    const card=document.createElement('div');card.className='joint-card';
+    const h=document.createElement('div');h.className='joint-header';
+    h.innerHTML=`<span class="joint-title">${j.name}</span><span class="joint-badge">${j.motions.length} ruchów</span>`;
+    const b=document.createElement('div');b.className='joint-body open';
+    j.motions.forEach(mo=>{
+      const d=document.createElement('div');d.className='motion-group';
+      d.innerHTML=`<div class="motion-label">${mo.m}</div><ul class="motion-muscles">${mo.ms.map(s=>`<li>${s}</li>`).join('')}</ul>`;
+      b.appendChild(d);
+    });
+    h.onclick=()=>b.classList.toggle('open');
+    card.appendChild(h);card.appendChild(b);
+    grid.appendChild(card);
+  });
+  if(!count){
+    const d=document.createElement('div');d.className='no-result';
+    d.innerHTML=`<span>∅</span>Brak wyników dla: „${filter}"`;
+    grid.appendChild(d);
+  }
+}
+renderJoints();
+document.getElementById('joint-search').addEventListener('input',e=>renderJoints(e.target.value));
+
+/* ──── BREATHING ──── */
+const bg=document.getElementById('breath-grid');
+breathing.forEach(b=>{
+  const card=document.createElement('div');card.className=`breath-card ${b.type}`;
+  const h=document.createElement('div');h.className=`breath-header ${b.type}`;
+  h.innerHTML=`<span class="breath-dot"></span><span class="breath-title">${b.name}</span><span class="breath-count">${b.ms.length} mm.</span>`;
+  const body=document.createElement('div');body.className='breath-body open';
+  body.innerHTML=`<ul class="breath-muscles">${b.ms.map(s=>`<li>${s}</li>`).join('')}</ul>`;
+  h.onclick=()=>body.classList.toggle('open');
+  card.appendChild(h);card.appendChild(body);
+  bg.appendChild(card);
+});
+
+/* ──── TABS ──── */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('panel-'+t.dataset.panel).classList.add('active');
+  };
+});
+</script>
+</body>
+</html>
